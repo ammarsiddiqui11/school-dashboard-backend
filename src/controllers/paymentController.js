@@ -113,10 +113,10 @@ exports.handleWebhook = async (req, res, next) => {
       });
     }
 
-    // ✅ Generate fresh sign for Edviron status API
+    
     const sign = generateSignForStatus(searchId);
 
-    // ✅ Call Edviron collect-request status API
+   
     const response = await axios.get(
       `${process.env.PAYMENT_API_ENDPOINT2}/${searchId}`,
       {
@@ -179,7 +179,7 @@ exports.getAllTransactions = async (req, res, next) => {
     
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const sortField = req.query.sort || "createdAt"; 
+    const sortField = req.query.sort || "payment_time"; 
     const sortOrder = req.query.order === "asc" ? 1 : -1;
 
     const skip = (page - 1) * limit;
@@ -188,7 +188,7 @@ exports.getAllTransactions = async (req, res, next) => {
     const [transactions, total] = await Promise.all([
       OrderStatus.find()
         .populate("collect_id")
-        .sort({ [sortField]: sortOrder })
+        .sort({ [sortField]: sortOrder, createdAt: -1 })
         .skip(skip)
         .limit(limit),
       OrderStatus.countDocuments()
